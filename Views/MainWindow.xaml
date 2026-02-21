@@ -1,0 +1,95 @@
+<Window x:Class="ProjectManager.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Менеджер проектов" 
+        Height="800" 
+        Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource LightGrayBrush}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- Боковое меню навигации -->
+        <Border Grid.Column="0" 
+                Background="{StaticResource DarkBlueBrush}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <!-- Заголовок меню -->
+                <Border Grid.Row="0" 
+                        Background="{StaticResource GraphiteBrush}" 
+                        Padding="20,15">
+                    <TextBlock Text="Менеджер проектов" 
+                               Foreground="White"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               FontFamily="{StaticResource MainFont}"/>
+                </Border>
+                
+                <!-- Навигационные кнопки -->
+                <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                    <Button Content="📊 Проекты" 
+                            Style="{StaticResource NavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Projects"/>
+                    <Button Content="✓ Задачи" 
+                            Style="{StaticResource NavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Tasks"/>
+                    <Button Content="👥 Команда" 
+                            Style="{StaticResource NavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Team"/>
+                    <Button Content="📈 Статистика" 
+                            Style="{StaticResource NavButton}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Statistics"/>
+                </StackPanel>
+                
+                <!-- Информация о пользователе -->
+                <Border Grid.Row="2" 
+                        Background="{StaticResource GraphiteBrush}" 
+                        Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="Пользователь" 
+                                   Foreground="#BDC3C7"
+                                   FontSize="12"
+                                   Margin="0,0,0,5"/>
+                        <TextBlock Text="{Binding CurrentUser}" 
+                                   Foreground="White"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+        
+        <!-- Основная рабочая область -->
+        <Grid Grid.Column="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Заголовок раздела -->
+            <TextBlock Grid.Row="0" 
+                       Text="{Binding CurrentViewTitle}"
+                       Style="{StaticResource HeadingText}"
+                       Margin="0,0,0,20"/>
+            
+            <!-- Контент раздела -->
+            <ContentControl Grid.Row="1" 
+                          Content="{Binding CurrentViewContent}"/>
+        </Grid>
+    </Grid>
+</Window>
