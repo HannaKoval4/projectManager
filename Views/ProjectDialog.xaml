@@ -1,8 +1,8 @@
 <Window x:Class="ProjectManager.Views.ProjectDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Проект" Height="520" Width="720"
-        MinHeight="460"
+        Title="Проект" Height="600" Width="720"
+        MinHeight="520"
         MinWidth="680"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
@@ -62,7 +62,15 @@
                                  Margin="{StaticResource FormFieldSpacing}"/>
 
                         <TextBlock Text="Дедлайн" Style="{StaticResource LabelText}"/>
-                        <DatePicker SelectedDate="{Binding Deadline}"/>
+                        <DatePicker SelectedDate="{Binding Deadline}" Margin="{StaticResource FormFieldSpacing}"/>
+
+                        <TextBlock Text="Заметки (ваша информация)" Style="{StaticResource LabelText}"/>
+                        <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"
+                                 MinHeight="100"
+                                 Margin="{StaticResource FormFieldSpacing}"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>

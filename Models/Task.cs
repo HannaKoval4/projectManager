@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -31,5 +32,12 @@ namespace ProjectManager.Models
 
         [ForeignKey("EmployeeID")]
         public virtual Employee Employee { get; set; }
+
+        public virtual ICollection<TaskComment> Comments { get; set; }
+
+        public Task()
+        {
+            Comments = new HashSet<TaskComment>();
+        }
     }
 }

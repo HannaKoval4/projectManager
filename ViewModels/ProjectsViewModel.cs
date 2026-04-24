@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 using ProjectManager.Data;
 using ProjectManager.Models;
+using ProjectManager.Services;
 using ProjectManager.Views;
 
 namespace ProjectManager.ViewModels
@@ -30,6 +31,7 @@ namespace ProjectManager.ViewModels
         public RelayCommand AddProjectCommand { get; set; }
         public RelayCommand EditProjectCommand { get; set; }
         public RelayCommand CompleteProjectCommand { get; set; }
+        public RelayCommand OpenProjectCommand { get; set; }
 
         public ProjectsViewModel(ProjectManagerDbContext context)
         {
@@ -39,6 +41,7 @@ namespace ProjectManager.ViewModels
             AddProjectCommand = new RelayCommand(AddProject);
             EditProjectCommand = new RelayCommand(EditProject, () => SelectedProject != null);
             CompleteProjectCommand = new RelayCommand(CompleteProject, () => SelectedProject != null);
+            OpenProjectCommand = new RelayCommand(() => OpenProject(SelectedProject), () => SelectedProject != null);
 
             LoadProjects();
         }
@@ -65,6 +68,17 @@ namespace ProjectManager.ViewModels
             {
                 MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        public void OpenProject(Project project)
+        {
+            if (project == null) return;
+            var w = new ProjectDetailsWindow(project.ID)
+            {
+                Owner = Application.Current?.MainWindow
+            };
+            w.ShowDialog();
+            LoadProjects();
         }
 
         private void AddProject()
@@ -99,8 +113,32 @@ namespace ProjectManager.ViewModels
 
             if (result == MessageBoxResult.Yes)
             {
-                // Здесь можно добавить логику завершения проекта
-                MessageBox.Show("Проект отмечен как завершенный", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                var projectId = SelectedProject.ID;
+                if (!DatabaseService.ExecuteInTransaction(_context, () =>
+                {
+                    var project = _context.Projects
+                        .Include("Tasks")
+                        .FirstOrDefault(p => p.ID == projectId);
+                    if (project == null) return;
+                    if (project.Tasks == null || project.Tasks.Count == 0)
+                    {
+                        return;
+                    }
+                    foreach (var task in project.Tasks)
+                    {
+                        DatabaseService.UnlinkIfEmployeeMissingOrDeleted(_context, task);
+                        if (task.Status != "Завершена")
+                        {
+                            task.Status = "Завершена";
+                        }
+                    }
+                }, out string error))
+                {
+                    MessageBox.Show(error, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                MessageBox.Show("Все задачи проекта отмечены как завершённые.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadProjects();
             }
         }

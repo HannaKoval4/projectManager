@@ -3,6 +3,7 @@ using System.Data.Entity;
 using System.Data.Entity.Validation;
 using System.Linq;
 using ProjectManager.Data;
+using TaskModel = ProjectManager.Models.Task;
 
 namespace ProjectManager.Services
 {
@@ -54,6 +55,28 @@ namespace ProjectManager.Services
         public static bool ExecuteInTransaction(ProjectManagerDbContext context, Action operation)
         {
             return ExecuteInTransaction(context, operation, out _);
+        }
+
+        /// <summary>
+        /// Снимает ссылку на сотрудника, если сущность удалена в контексте или отсутствует.
+        /// Иначе обновление задачи при SaveChanges падает с ошибкой о «deleted principal».
+        /// </summary>
+        public static void UnlinkIfEmployeeMissingOrDeleted(ProjectManagerDbContext context, TaskModel task)
+        {
+            if (task == null || !task.EmployeeID.HasValue) return;
+            var id = task.EmployeeID.Value;
+            var employee = context.Employees.Find(id);
+            if (employee == null)
+            {
+                task.Employee = null;
+                task.EmployeeID = null;
+                return;
+            }
+            if (context.Entry(employee).State == EntityState.Deleted)
+            {
+                task.Employee = null;
+                task.EmployeeID = null;
+            }
         }
     }
 }

@@ -95,6 +95,7 @@ namespace ProjectManager.ViewModels
 
             if (!DatabaseService.ExecuteInTransaction(_context, () =>
             {
+                DatabaseService.UnlinkIfEmployeeMissingOrDeleted(_context, taskToUpdate);
                 taskToUpdate.Status = newStatus;
             }, out string error))
             {
@@ -234,6 +235,7 @@ namespace ProjectManager.ViewModels
 
             if (!DatabaseService.ExecuteInTransaction(_context, () =>
             {
+                DatabaseService.UnlinkIfEmployeeMissingOrDeleted(_context, taskToComplete);
                 taskToComplete.Status = "Завершена";
             }, out string error))
             {

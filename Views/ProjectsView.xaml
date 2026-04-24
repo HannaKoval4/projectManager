@@ -19,6 +19,9 @@
                 <Button Content="Добавить проект" 
                         Style="{StaticResource ToolbarSuccessButton}"
                         Command="{Binding AddProjectCommand}"/>
+                <Button Content="Открыть" 
+                        Style="{StaticResource ToolbarPrimaryButton}"
+                        Command="{Binding OpenProjectCommand}"/>
                 <Button Content="Изменить" 
                         Style="{StaticResource ToolbarPrimaryButton}"
                         Command="{Binding EditProjectCommand}"/>
@@ -38,12 +41,22 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Style="{StaticResource CardStyle}" 
-                                Width="300" 
+                        <Border Width="300" 
                                 Height="200"
                                 MouseLeftButtonDown="ProjectCard_MouseLeftButtonDown"
                                 Cursor="Hand"
                                 Margin="0,0,15,15">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource CardStyle}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                            <Setter Property="BorderBrush" Value="#16A34A"/>
+                                            <Setter Property="BorderThickness" Value="2"/>
+                                            <Setter Property="Opacity" Value="0.95"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
@@ -53,11 +66,37 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 
-                                <TextBlock Grid.Row="0" 
+                                <Grid Grid.Row="0" Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" 
                                            Text="{Binding Name}" 
                                            Style="{StaticResource SubHeadingText}"
-                                           Margin="0,0,0,10"
                                            TextWrapping="Wrap"/>
+                                    <Border Grid.Column="1" 
+                                            Background="#DCFCE7" 
+                                            CornerRadius="4" 
+                                            Padding="8,3" 
+                                            VerticalAlignment="Top"
+                                            Margin="8,0,0,0"
+                                            Visibility="Collapsed">
+                                        <TextBlock Text="Готово" 
+                                                   Foreground="#166534" 
+                                                   FontSize="10" 
+                                                   FontWeight="SemiBold"/>
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCompleted}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                    </Border>
+                                </Grid>
                                 
                                 <TextBlock Grid.Row="1" 
                                            Text="{Binding Description}" 

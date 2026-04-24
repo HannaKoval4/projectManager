@@ -37,3 +37,5 @@ C:\Users\user1\Desktop\projectManager\obj\Debug\ProjectManager.exe
 C:\Users\user1\Desktop\projectManager\obj\Debug\ProjectManager.pdb
 C:\Users\user1\Desktop\projectManager\obj\Debug\Views\RegisterWindow.baml
 C:\Users\user1\Desktop\projectManager\obj\Debug\Views\RegisterWindow.g.cs
+c:\Users\user1\Desktop\projectManager\obj\Debug\Views\ProjectDetailsWindow.g.cs
+c:\Users\user1\Desktop\projectManager\obj\Debug\Views\ProjectDetailsWindow.baml

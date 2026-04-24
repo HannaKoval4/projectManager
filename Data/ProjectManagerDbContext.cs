@@ -16,6 +16,7 @@ namespace ProjectManager.Data
 
         public DbSet<Project> Projects { get; set; }
         public DbSet<Task> Tasks { get; set; }
+        public DbSet<TaskComment> TaskComments { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<User> Users { get; set; }
 
@@ -32,6 +33,12 @@ namespace ProjectManager.Data
                 .WithOptional(t => t.Employee)
                 .HasForeignKey(t => t.EmployeeID)
                 .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Task>()
+                .HasMany(t => t.Comments)
+                .WithRequired(c => c.Task)
+                .HasForeignKey(c => c.TaskID)
+                .WillCascadeOnDelete(true);
 
             modelBuilder.Entity<User>()
                 .HasOptional(u => u.Employee)

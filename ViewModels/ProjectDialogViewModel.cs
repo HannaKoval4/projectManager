@@ -9,6 +9,7 @@ namespace ProjectManager.ViewModels
         private string _name;
         private string _description;
         private DateTime? _deadline;
+        private string _notes;
 
         public Project Project { get; set; }
 
@@ -42,6 +43,16 @@ namespace ProjectManager.ViewModels
             }
         }
 
+        public string Notes
+        {
+            get => _notes;
+            set
+            {
+                _notes = value;
+                OnPropertyChanged(nameof(Notes));
+            }
+        }
+
         public ProjectDialogViewModel()
         {
             Project = new Project();
@@ -53,6 +64,7 @@ namespace ProjectManager.ViewModels
             Name = project.Name;
             Description = project.Description;
             Deadline = project.Deadline;
+            Notes = project.Notes;
         }
 
         public bool Validate()
@@ -74,6 +86,7 @@ namespace ProjectManager.ViewModels
             Project.Name = Name;
             Project.Description = Description;
             Project.Deadline = Deadline;
+            Project.Notes = string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

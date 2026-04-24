@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\user1\Desktop\projectManager\obj\Debug\
+c:\Users\user1\Desktop\projectManager\obj\Debug\
 ProjectManager
 none
 false
 DEBUG;TRACE
-C:\Users\user1\Desktop\projectManager\App.xaml
-11-2027750704
+c:\Users\user1\Desktop\projectManager\App.xaml
+121544499603
 
-32-182471513
-16-96460342
-Views\MainWindow.xaml;Views\ProjectDialog.xaml;Views\TaskDialog.xaml;Views\LoginWindow.xaml;Views\RegisterWindow.xaml;Views\ProjectsView.xaml;Views\TasksView.xaml;Views\TeamView.xaml;Views\StatisticsView.xaml;Views\EmployeeDialog.xaml;Styles.xaml;
+37-1753954775
+161934204153
+Views\MainWindow.xaml;Views\ProjectDialog.xaml;Views\TaskDialog.xaml;Views\LoginWindow.xaml;Views\RegisterWindow.xaml;Views\ProjectDetailsWindow.xaml;Views\ProjectsView.xaml;Views\TasksView.xaml;Views\TeamView.xaml;Views\StatisticsView.xaml;Views\EmployeeDialog.xaml;Styles.xaml;
 
 False
 

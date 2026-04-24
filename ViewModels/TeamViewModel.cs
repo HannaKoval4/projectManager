@@ -131,6 +131,15 @@ namespace ProjectManager.ViewModels
                 {
                     if (!DatabaseService.ExecuteInTransaction(_context, () =>
                     {
+                        var id = employeeToDelete.ID;
+                        foreach (var task in _context.Tasks.Where(t => t.EmployeeID == id))
+                        {
+                            task.EmployeeID = null;
+                        }
+                        foreach (var user in _context.Users.Where(u => u.EmployeeID == id))
+                        {
+                            user.EmployeeID = null;
+                        }
                         _context.Employees.Remove(employeeToDelete);
                     }, out string error))
                     {

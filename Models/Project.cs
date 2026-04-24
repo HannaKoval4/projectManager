@@ -20,6 +20,9 @@ namespace ProjectManager.Models
 
         public DateTime? Deadline { get; set; }
 
+        /// <summary>Личные заметки и важная информация по проекту.</summary>
+        public string Notes { get; set; }
+
         public virtual ICollection<Task> Tasks { get; set; }
 
         [NotMapped]
@@ -30,6 +33,17 @@ namespace ProjectManager.Models
                 if (Tasks == null || Tasks.Count == 0) return 0;
                 var completedTasks = Tasks.Count(t => t.Status == "Завершена");
                 return (double)completedTasks / Tasks.Count * 100;
+            }
+        }
+
+        /// <summary>Есть ли хотя бы одна задача и все задачи в статусе «Завершена».</summary>
+        [NotMapped]
+        public bool IsCompleted
+        {
+            get
+            {
+                if (Tasks == null || Tasks.Count == 0) return false;
+                return Tasks.All(t => t.Status == "Завершена");
             }
         }
 

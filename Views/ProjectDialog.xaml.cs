@@ -73,6 +73,7 @@ namespace ProjectManager.Views
                         existingProject.Name = Project.Name;
                         existingProject.Description = Project.Description;
                         existingProject.Deadline = Project.Deadline;
+                        existingProject.Notes = Project.Notes;
                     }
                 }
             }, out string error))
