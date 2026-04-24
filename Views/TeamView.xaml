@@ -17,13 +17,13 @@
                 Padding="15">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Добавить сотрудника" 
-                        Style="{StaticResource SuccessButton}"
+                        Style="{StaticResource ToolbarSuccessButton}"
                         Command="{Binding AddEmployeeCommand}"/>
                 <Button Content="Изменить" 
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{StaticResource ToolbarPrimaryButton}"
                         Command="{Binding EditEmployeeCommand}"/>
                 <Button Content="Удалить" 
-                        Style="{StaticResource DangerButton}"
+                        Style="{StaticResource ToolbarDangerButton}"
                         Command="{Binding DeleteEmployeeCommand}"/>
             </StackPanel>
         </Border>
@@ -34,16 +34,7 @@
                   SelectedItem="{Binding SelectedEmployee}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  GridLinesVisibility="None"
-                  HeadersVisibility="Column"
-                  SelectionMode="Single"
-                  SelectionUnit="FullRow"
-                  Background="White"
-                  BorderBrush="#E0E0E0"
-                  BorderThickness="1"
-                  RowBackground="White"
-                  AlternatingRowBackground="#F9F9F9">
+                  CanUserDeleteRows="False">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding ID}" Width="50"/>
                 <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="*"/>
@@ -53,6 +44,7 @@
         </DataGrid>
     </Grid>
 </UserControl>
+
 
 
 

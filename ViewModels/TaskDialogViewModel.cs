@@ -10,14 +10,30 @@ namespace ProjectManager.ViewModels
     public class TaskDialogViewModel : INotifyPropertyChanged
     {
         private ProjectManagerDbContext _context;
-        private Task _task;
+        private ProjectManager.Models.Task _task;
+        private Project _selectedProject;
         private Employee _selectedEmployee;
         private string _status;
         private string _priority;
 
+        public ObservableCollection<Project> Projects { get; set; }
         public ObservableCollection<Employee> Employees { get; set; }
         public ObservableCollection<string> Statuses { get; set; }
         public ObservableCollection<string> Priorities { get; set; }
+
+        public Project SelectedProject
+        {
+            get => _selectedProject;
+            set
+            {
+                _selectedProject = value;
+                if (_task != null && _selectedProject != null)
+                {
+                    _task.ProjectID = _selectedProject.ID;
+                }
+                OnPropertyChanged(nameof(SelectedProject));
+            }
+        }
 
         public Employee SelectedEmployee
         {
@@ -60,23 +76,27 @@ namespace ProjectManager.ViewModels
             }
         }
 
-        public TaskDialogViewModel(int projectId, ProjectManagerDbContext context, Task task = null)
+        public TaskDialogViewModel(int projectId, ProjectManagerDbContext context, ProjectManager.Models.Task task = null)
         {
             _context = context;
-            
+
             if (task != null)
             {
                 _task = task;
-                Title = task.Title;
-                Status = task.Status;
-                Priority = task.Priority;
+                _title = task.Title;
+                _status = task.Status;
+                _priority = task.Priority;
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Status));
+                OnPropertyChanged(nameof(Priority));
                 SelectedEmployee = task.Employee;
             }
             else
             {
-                _task = new Task { ProjectID = projectId };
+                _task = new ProjectManager.Models.Task { ProjectID = projectId };
             }
 
+            Projects = new ObservableCollection<Project>(_context.Projects.OrderBy(p => p.Name).ToList());
             Employees = new ObservableCollection<Employee>(_context.Employees.ToList());
             Statuses = new ObservableCollection<string> { "Новая", "В работе", "На проверке", "Завершена" };
             Priorities = new ObservableCollection<string> { "Низкий", "Средний", "Высокий", "Критический" };
@@ -86,22 +106,29 @@ namespace ProjectManager.ViewModels
                 Status = Statuses.First();
                 Priority = Priorities[1];
             }
+
+            if (projectId > 0)
+            {
+                SelectedProject = Projects.FirstOrDefault(p => p.ID == projectId);
+            }
+
+            if (SelectedProject == null)
+            {
+                SelectedProject = Projects.FirstOrDefault();
+            }
+
+            if (task != null)
+            {
+                SelectedProject = Projects.FirstOrDefault(p => p.ID == _task.ProjectID) ?? _context.Projects.Find(_task.ProjectID);
+            }
         }
 
         public bool Validate()
         {
-            if (string.IsNullOrWhiteSpace(Title))
-            {
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(Status))
-            {
-                return false;
-            }
-            if (string.IsNullOrWhiteSpace(Priority))
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(Title)) return false;
+            if (SelectedProject == null) return false;
+            if (string.IsNullOrWhiteSpace(Status)) return false;
+            if (string.IsNullOrWhiteSpace(Priority)) return false;
             return true;
         }
 
@@ -115,6 +142,7 @@ namespace ProjectManager.ViewModels
             _task.Title = Title;
             _task.Status = Status;
             _task.Priority = Priority;
+            _task.ProjectID = SelectedProject.ID;
             _task.EmployeeID = SelectedEmployee?.ID;
 
             if (_task.ID == 0)
@@ -131,5 +159,3 @@ namespace ProjectManager.ViewModels
         }
     }
 }
-
-

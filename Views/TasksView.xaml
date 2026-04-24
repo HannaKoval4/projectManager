@@ -29,18 +29,18 @@
                 Padding="15">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Добавить задачу (Ctrl+N)" 
-                        Style="{StaticResource SuccessButton}"
+                        Style="{StaticResource ToolbarSuccessButton}"
                         Command="{Binding AddTaskCommand}"/>
                 <Button Content="Изменить (Ctrl+E)" 
-                        Style="{StaticResource PrimaryButton}"
+                        Style="{StaticResource ToolbarPrimaryButton}"
                         Command="{Binding EditTaskCommand}"/>
                 <Button Content="Завершить (Del)" 
-                        Style="{StaticResource SecondaryButton}"
+                        Style="{StaticResource ToolbarSecondaryButton}"
                         Command="{Binding CompleteTaskCommand}"/>
                 <Button Content="Сбросить фильтры (Ctrl+F)" 
-                        Style="{StaticResource SecondaryButton}"
+                        Style="{StaticResource ToolbarSecondaryButton}"
                         Command="{Binding ResetFiltersCommand}"
-                        Margin="20,0,0,0"/>
+                        />
             </StackPanel>
         </Border>
         
@@ -58,7 +58,7 @@
                 </Grid.ColumnDefinitions>
                 
                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                    <TextBlock Text="Проект" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <TextBlock Text="Проект" Style="{StaticResource LabelText}" Margin="0,0,0,6"/>
                     <ComboBox ItemsSource="{Binding Projects}" 
                               SelectedItem="{Binding SelectedProjectFilter}"
                               DisplayMemberPath="Name"
@@ -66,19 +66,19 @@
                 </StackPanel>
                 
                 <StackPanel Grid.Column="1" Margin="10,0,10,0">
-                    <TextBlock Text="Статус" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <TextBlock Text="Статус" Style="{StaticResource LabelText}" Margin="0,0,0,6"/>
                     <ComboBox ItemsSource="{Binding Statuses}" 
                               SelectedItem="{Binding SelectedStatusFilter}"/>
                 </StackPanel>
                 
                 <StackPanel Grid.Column="2" Margin="10,0,10,0">
-                    <TextBlock Text="Приоритет" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <TextBlock Text="Приоритет" Style="{StaticResource LabelText}" Margin="0,0,0,6"/>
                     <ComboBox ItemsSource="{Binding Priorities}" 
                               SelectedItem="{Binding SelectedPriorityFilter}"/>
                 </StackPanel>
                 
                 <StackPanel Grid.Column="3" Margin="10,0,0,0">
-                    <TextBlock Text="Исполнитель" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                    <TextBlock Text="Исполнитель" Style="{StaticResource LabelText}" Margin="0,0,0,6"/>
                     <ComboBox ItemsSource="{Binding Employees}" 
                               SelectedItem="{Binding SelectedEmployeeFilter}"
                               DisplayMemberPath="FullName"
@@ -154,14 +154,14 @@
                                             Grid.Column="0"
                                             Orientation="Horizontal">
                                     <TextBlock Text="Проект: " 
-                                               Foreground="#7F8C8D"
+                                               Foreground="{StaticResource TextMutedBrush}"
                                                FontSize="12"/>
                                     <TextBlock Text="{Binding Project.Name}" 
                                                Foreground="{StaticResource AccentBlueBrush}"
                                                FontSize="12"
                                                FontWeight="SemiBold"/>
                                     <TextBlock Text=" | Исполнитель: " 
-                                               Foreground="#7F8C8D"
+                                               Foreground="{StaticResource TextMutedBrush}"
                                                FontSize="12"
                                                Margin="10,0,0,0"/>
                                     <TextBlock Text="{Binding Employee.FullName, FallbackValue='Не назначен'}" 

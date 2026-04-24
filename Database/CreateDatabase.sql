@@ -38,6 +38,18 @@ CREATE TABLE Tasks (
 );
 GO
 
+CREATE TABLE Users (
+    ID INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(100) NOT NULL,
+    PasswordHash VARBINARY(64) NOT NULL,
+    PasswordSalt VARBINARY(16) NOT NULL,
+    CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME(),
+    EmployeeID INT NULL,
+    CONSTRAINT UQ_Users_Username UNIQUE (Username),
+    CONSTRAINT FK_Users_Employees FOREIGN KEY (EmployeeID) REFERENCES Employees(ID) ON DELETE SET NULL
+);
+GO
+
 INSERT INTO Employees (FullName, Position) VALUES
 (N'Иванов Иван Иванович', N'Разработчик'),
 (N'Петрова Мария Сергеевна', N'Менеджер проектов'),
@@ -51,12 +63,6 @@ GO
 
 INSERT INTO Tasks (ProjectID, Title, Status, Priority, EmployeeID) VALUES
 (1, N'Дизайн главной страницы', N'В работе', N'Высокий', 1),
-(1, N'Разработка API', N'Запланировано', N'Средний', 1),
-(2, N'Прототипирование интерфейса', N'Завершено', N'Высокий', 2);
+(1, N'Разработка API', N'Новая', N'Средний', 1),
+(2, N'Прототипирование интерфейса', N'Завершена', N'Высокий', 2);
 GO
-
-
-
-
-
-

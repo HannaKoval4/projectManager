@@ -33,9 +33,3 @@ namespace ProjectManager.Models
         public virtual Employee Employee { get; set; }
     }
 }
-
-
-
-
-
-

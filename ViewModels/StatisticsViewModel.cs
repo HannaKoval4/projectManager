@@ -51,26 +51,6 @@ namespace ProjectManager.ViewModels
         {
             try
             {
-                var now = DateTime.Now;
-                DateTime startDate;
-
-                switch (_selectedPeriod)
-                {
-                    case "Month":
-                        startDate = new DateTime(now.Year, now.Month, 1);
-                        break;
-                    case "Quarter":
-                        var quarter = (now.Month - 1) / 3;
-                        startDate = new DateTime(now.Year, quarter * 3 + 1, 1);
-                        break;
-                    case "Year":
-                        startDate = new DateTime(now.Year, 1, 1);
-                        break;
-                    default:
-                        startDate = new DateTime(now.Year, now.Month, 1);
-                        break;
-                }
-
                 TotalProjects = _context.Projects.Count();
                 CompletedTasks = _context.Tasks.Count(t => t.Status == "Завершена");
                 ActiveTasks = _context.Tasks.Count(t => t.Status != "Завершена");
@@ -82,7 +62,6 @@ namespace ProjectManager.ViewModels
                 OnPropertyChanged(nameof(TotalEmployees));
 
                 EmployeeStatistics.Clear();
-                // Оптимизация: используем AsNoTracking для чтения
                 var employees = _context.Employees
                     .Include("Tasks")
                     .AsNoTracking()
@@ -118,4 +97,3 @@ namespace ProjectManager.ViewModels
         }
     }
 }
-

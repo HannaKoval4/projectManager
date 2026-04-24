@@ -1,13 +1,9 @@
-using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data.Entity;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using ProjectManager.Data;
-using ProjectManager.Models;
 using ProjectManager.Views;
+using ProjectManager.Services;
 
 namespace ProjectManager.ViewModels
 {
@@ -17,7 +13,10 @@ namespace ProjectManager.ViewModels
         private string _currentView = "Projects";
         private UserControl _currentViewContent;
         private string _currentViewTitle = "Проекты";
-        private string _currentUser = "Администратор";
+        private string _currentUser = "Гость";
+        private int _projectsCount;
+        private int _tasksCount;
+        private int _employeesCount;
 
         public string CurrentView
         {
@@ -60,12 +59,46 @@ namespace ProjectManager.ViewModels
             }
         }
 
+        public int ProjectsCount
+        {
+            get => _projectsCount;
+            private set
+            {
+                _projectsCount = value;
+                OnPropertyChanged(nameof(ProjectsCount));
+            }
+        }
+
+        public int TasksCount
+        {
+            get => _tasksCount;
+            private set
+            {
+                _tasksCount = value;
+                OnPropertyChanged(nameof(TasksCount));
+            }
+        }
+
+        public int EmployeesCount
+        {
+            get => _employeesCount;
+            private set
+            {
+                _employeesCount = value;
+                OnPropertyChanged(nameof(EmployeesCount));
+            }
+        }
+
         public RelayCommand<string> NavigateCommand { get; set; }
+        public RelayCommand LogoutCommand { get; set; }
 
         public MainViewModel()
         {
             _context = new ProjectManagerDbContext();
             NavigateCommand = new RelayCommand<string>(Navigate);
+            LogoutCommand = new RelayCommand(Logout);
+            CurrentUser = SessionService.CurrentUser?.Username ?? "Гость";
+            RefreshCounts();
             UpdateView();
         }
 
@@ -76,6 +109,7 @@ namespace ProjectManager.ViewModels
 
         private void UpdateView()
         {
+            RefreshCounts();
             switch (_currentView)
             {
                 case "Projects":
@@ -101,11 +135,45 @@ namespace ProjectManager.ViewModels
             }
         }
 
+        private void RefreshCounts()
+        {
+            try
+            {
+                ProjectsCount = _context.Projects.Count();
+                TasksCount = _context.Tasks.Count();
+                EmployeesCount = _context.Employees.Count();
+            }
+            catch
+            {
+                // если БД недоступна на старте, не роняем UI
+                ProjectsCount = 0;
+                TasksCount = 0;
+                EmployeesCount = 0;
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void Logout()
+        {
+            SessionService.Clear();
+
+            var login = new LoginWindow();
+            login.Show();
+
+            foreach (var w in System.Windows.Application.Current.Windows)
+            {
+                if (w is MainWindow main)
+                {
+                    main.Close();
+                    break;
+                }
+            }
         }
     }
 }

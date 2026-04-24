@@ -3,12 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:conv="clr-namespace:ProjectManager.Converters"
         mc:Ignorable="d"
         Title="Менеджер проектов" 
         Height="800" 
         Width="1400"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource LightGrayBrush}">
+    <Window.Resources>
+        <conv:StringEqualsConverter x:Key="StringEqualsConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -37,23 +41,35 @@
                 </Border>
                 
                 <!-- Навигационные кнопки -->
-                <StackPanel Grid.Row="1" Margin="0,10,0,0">
-                    <Button Content="📊 Проекты" 
-                            Style="{StaticResource NavButton}"
-                            Command="{Binding NavigateCommand}"
-                            CommandParameter="Projects"/>
-                    <Button Content="✓ Задачи" 
-                            Style="{StaticResource NavButton}"
-                            Command="{Binding NavigateCommand}"
-                            CommandParameter="Tasks"/>
-                    <Button Content="👥 Команда" 
-                            Style="{StaticResource NavButton}"
-                            Command="{Binding NavigateCommand}"
-                            CommandParameter="Team"/>
-                    <Button Content="📈 Статистика" 
-                            Style="{StaticResource NavButton}"
-                            Command="{Binding NavigateCommand}"
-                            CommandParameter="Statistics"/>
+                <StackPanel Grid.Row="1" Margin="0,12,0,0">
+                    <RadioButton Content="Проекты"
+                                 Style="{StaticResource NavPill}"
+                                 GroupName="Nav"
+                                 Tag="{Binding ProjectsCount}"
+                                 IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Projects}"
+                                 Command="{Binding NavigateCommand}"
+                                 CommandParameter="Projects"/>
+                    <RadioButton Content="Задачи"
+                                 Style="{StaticResource NavPill}"
+                                 GroupName="Nav"
+                                 Tag="{Binding TasksCount}"
+                                 IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Tasks}"
+                                 Command="{Binding NavigateCommand}"
+                                 CommandParameter="Tasks"/>
+                    <RadioButton Content="Команда"
+                                 Style="{StaticResource NavPill}"
+                                 GroupName="Nav"
+                                 Tag="{Binding EmployeesCount}"
+                                 IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Team}"
+                                 Command="{Binding NavigateCommand}"
+                                 CommandParameter="Team"/>
+                    <RadioButton Content="Статистика"
+                                 Style="{StaticResource NavPill}"
+                                 GroupName="Nav"
+                                 Tag=""
+                                 IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Statistics}"
+                                 Command="{Binding NavigateCommand}"
+                                 CommandParameter="Statistics"/>
                 </StackPanel>
                 
                 <!-- Информация о пользователе -->
@@ -69,13 +85,17 @@
                                    Foreground="White"
                                    FontSize="14"
                                    FontWeight="SemiBold"/>
+                        <Button Content="Выйти"
+                                Style="{StaticResource NavButton}"
+                                Margin="0,10,0,0"
+                                Command="{Binding LogoutCommand}"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </Border>
         
         <!-- Основная рабочая область -->
-        <Grid Grid.Column="1" Margin="20">
+        <Grid Grid.Column="1" Margin="24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>

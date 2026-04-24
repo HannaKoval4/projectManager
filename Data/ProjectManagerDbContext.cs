@@ -5,6 +5,11 @@ namespace ProjectManager.Data
 {
     public class ProjectManagerDbContext : DbContext
     {
+        static ProjectManagerDbContext()
+        {
+            Database.SetInitializer<ProjectManagerDbContext>(null);
+        }
+
         public ProjectManagerDbContext() : base("ProjectManagerConnection")
         {
         }
@@ -12,6 +17,7 @@ namespace ProjectManager.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Employee> Employees { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -27,13 +33,13 @@ namespace ProjectManager.Data
                 .HasForeignKey(t => t.EmployeeID)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<User>()
+                .HasOptional(u => u.Employee)
+                .WithMany()
+                .HasForeignKey(u => u.EmployeeID)
+                .WillCascadeOnDelete(false);
+
             base.OnModelCreating(modelBuilder);
         }
     }
 }
-
-
-
-
-
-
