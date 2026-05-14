@@ -37,21 +37,34 @@ namespace ProjectManager.Views
 
             bool hasError = false;
 
-            if (string.IsNullOrWhiteSpace(username))
+            var loginErr = FieldValidation.ValidateUsername(UsernameTextBox.Text);
+            if (loginErr != null)
             {
-                ShowFieldError(UsernameErrorText, "Введите логин.");
+                ShowFieldError(UsernameErrorText, loginErr);
                 hasError = true;
             }
 
-            if (string.IsNullOrWhiteSpace(password))
+            var passErr = FieldValidation.ValidateNewPassword(password);
+            if (passErr != null)
             {
-                ShowFieldError(PasswordErrorText, "Введите пароль.");
+                ShowFieldError(PasswordErrorText, passErr);
                 hasError = true;
             }
 
-            if (password != confirmPassword)
+            if (passErr == null)
             {
-                ShowFieldError(ConfirmPasswordErrorText, "Пароли не совпадают.");
+                var confirmErr = FieldValidation.ValidatePasswordConfirm(password, confirmPassword);
+                if (confirmErr != null)
+                {
+                    ShowFieldError(ConfirmPasswordErrorText, confirmErr);
+                    hasError = true;
+                }
+            }
+
+            var employeeErr = FieldValidation.ValidateEmployeeOptionalPair(fullName, position);
+            if (employeeErr != null)
+            {
+                ShowGeneralError(employeeErr);
                 hasError = true;
             }
 
@@ -110,17 +123,21 @@ namespace ProjectManager.Views
         {
             int? employeeId = null;
 
-            if (!string.IsNullOrWhiteSpace(fullName) || !string.IsNullOrWhiteSpace(position))
+            var employeePairErr = FieldValidation.ValidateEmployeeOptionalPair(fullName, position);
+            if (employeePairErr != null)
             {
-                if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(position))
-                {
-                    return (false, "Если заполняете сотрудника, заполните и ФИО, и должность.");
-                }
+                return (false, employeePairErr);
+            }
 
+            string fullNameTrim = fullName?.Trim() ?? string.Empty;
+            string positionTrim = position?.Trim() ?? string.Empty;
+
+            if (fullNameTrim.Length > 0 && positionTrim.Length > 0)
+            {
                 var employee = new Employee
                 {
-                    FullName = fullName,
-                    Position = position
+                    FullName = fullNameTrim,
+                    Position = positionTrim
                 };
 
                 using (var context = new ProjectManagerDbContext())

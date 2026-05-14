@@ -1,5 +1,6 @@
 using System.Windows;
 using ProjectManager.Models;
+using ProjectManager.Services;
 
 namespace ProjectManager.Views
 {
@@ -21,16 +22,43 @@ namespace ProjectManager.Views
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(NameTextBox.Text) || string.IsNullOrWhiteSpace(PositionTextBox.Text))
+            ClearFieldErrors();
+
+            var nameErr = FieldValidation.ValidateEmployeeNameRequired(NameTextBox.Text);
+            if (nameErr != null)
             {
-                MessageBox.Show("Заполните все поля", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                ShowError(NameErrorText, nameErr);
+            }
+
+            var posErr = FieldValidation.ValidateEmployeePositionRequired(PositionTextBox.Text);
+            if (posErr != null)
+            {
+                ShowError(PositionErrorText, posErr);
+            }
+
+            if (nameErr != null || posErr != null)
+            {
                 return;
             }
 
-            EmployeeName = NameTextBox.Text;
-            Position = PositionTextBox.Text;
+            EmployeeName = NameTextBox.Text.Trim();
+            Position = PositionTextBox.Text.Trim();
             DialogResult = true;
             Close();
+        }
+
+        private static void ShowError(System.Windows.Controls.TextBlock block, string message)
+        {
+            block.Text = message;
+            block.Visibility = Visibility.Visible;
+        }
+
+        private void ClearFieldErrors()
+        {
+            NameErrorText.Visibility = Visibility.Collapsed;
+            PositionErrorText.Visibility = Visibility.Collapsed;
+            NameErrorText.Text = string.Empty;
+            PositionErrorText.Text = string.Empty;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

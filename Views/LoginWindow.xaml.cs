@@ -30,15 +30,17 @@ namespace ProjectManager.Views
             string username = LoginTextBox.Text?.Trim();
             string password = GetPassword();
 
-            if (string.IsNullOrWhiteSpace(username))
+            var loginErr = FieldValidation.ValidateUsername(LoginTextBox.Text);
+            if (loginErr != null)
             {
-                ShowFieldError(LoginErrorText, "Введите логин.");
+                ShowFieldError(LoginErrorText, loginErr);
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(password))
+            var passErr = FieldValidation.ValidatePasswordForLogin(password);
+            if (passErr != null)
             {
-                ShowFieldError(PasswordErrorText, "Введите пароль.");
+                ShowFieldError(PasswordErrorText, passErr);
                 return;
             }
 

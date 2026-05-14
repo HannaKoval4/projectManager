@@ -42,7 +42,7 @@
                         <TextBlock Text="Название проекта" Style="{StaticResource LabelText}"/>
                         <TextBox Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"
                                  Margin="{StaticResource FormFieldSpacing}"/>
-                        <TextBlock Text="Название обязательно"
+                        <TextBlock Text="Укажите название (до 200 символов)."
                                    Foreground="{StaticResource DangerBrush}"
                                    FontSize="12"
                                    Margin="0,0,0,8">

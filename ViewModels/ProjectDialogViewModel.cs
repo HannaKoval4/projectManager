@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data.Entity;
 using System.Linq;
 using ProjectManager.Data;
 using ProjectManager.Models;
+using ProjectManager.Services;
 
 namespace ProjectManager.ViewModels
 {
@@ -37,7 +39,8 @@ namespace ProjectManager.ViewModels
             {
                 _name = value;
                 OnPropertyChanged(nameof(Name));
-                NameInvalid = string.IsNullOrWhiteSpace(value);
+                string t = value?.Trim() ?? string.Empty;
+                NameInvalid = string.IsNullOrWhiteSpace(t) || t.Length > FieldValidation.ProjectNameMaxLength;
             }
         }
 
@@ -141,21 +144,74 @@ namespace ProjectManager.ViewModels
             Responsible = project.ResponsibleEmployeeID.HasValue
                 ? Employees.FirstOrDefault(e => e.ID == project.ResponsibleEmployeeID.Value)
                 : null;
-            NameInvalid = string.IsNullOrWhiteSpace(Name);
+            string nameTrim = Name?.Trim() ?? string.Empty;
+            NameInvalid = string.IsNullOrWhiteSpace(nameTrim) || nameTrim.Length > FieldValidation.ProjectNameMaxLength;
             OnPropertyChanged(nameof(ProgressPercent));
         }
 
-        public bool Validate()
+        public IReadOnlyList<string> GetValidationErrorMessages()
         {
-            NameInvalid = string.IsNullOrWhiteSpace(Name);
-            return !NameInvalid;
+            var list = new List<string>();
+            string nameTrim = Name?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(nameTrim))
+            {
+                list.Add("Укажите название проекта.");
+            }
+            else if (nameTrim.Length > FieldValidation.ProjectNameMaxLength)
+            {
+                list.Add($"Название — не более {FieldValidation.ProjectNameMaxLength} символов.");
+            }
+
+            string clientTrim = Client?.Trim() ?? string.Empty;
+            if (clientTrim.Length > FieldValidation.ProjectClientMaxLength)
+            {
+                list.Add($"Клиент — не более {FieldValidation.ProjectClientMaxLength} символов.");
+            }
+
+            string tagsTrim = Tags?.Trim() ?? string.Empty;
+            if (tagsTrim.Length > FieldValidation.ProjectTagsMaxLength)
+            {
+                list.Add($"Теги — не более {FieldValidation.ProjectTagsMaxLength} символов.");
+            }
+
+            string st = ProjectStatus?.Trim() ?? string.Empty;
+            if (st.Length > FieldValidation.ProjectStatusMaxLength)
+            {
+                list.Add($"Статус — не более {FieldValidation.ProjectStatusMaxLength} символов.");
+            }
+
+            string pr = ProjectPriority?.Trim() ?? string.Empty;
+            if (pr.Length > FieldValidation.ProjectPriorityMaxLength)
+            {
+                list.Add($"Приоритет — не более {FieldValidation.ProjectPriorityMaxLength} символов.");
+            }
+
+            if (StartDate.HasValue && Deadline.HasValue && StartDate.Value.Date > Deadline.Value.Date)
+            {
+                list.Add("Дата начала не может быть позже дедлайна.");
+            }
+
+            if (Budget.HasValue && Budget.Value < 0)
+            {
+                list.Add("Бюджет не может быть отрицательным.");
+            }
+
+            return list;
+        }
+
+        public bool TryValidate(out IReadOnlyList<string> errors)
+        {
+            errors = GetValidationErrorMessages();
+            string nameTrim = Name?.Trim() ?? string.Empty;
+            NameInvalid = string.IsNullOrWhiteSpace(nameTrim) || nameTrim.Length > FieldValidation.ProjectNameMaxLength;
+            return errors.Count == 0;
         }
 
         public void Save()
         {
-            if (!Validate())
+            if (!TryValidate(out _))
             {
-                throw new InvalidOperationException("Название обязательно");
+                throw new InvalidOperationException("Проверьте заполнение полей проекта.");
             }
 
             Project.Name = Name?.Trim();

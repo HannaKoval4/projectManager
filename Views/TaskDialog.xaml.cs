@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using ProjectManager.Data;
 using ProjectManager.Services;
@@ -21,9 +22,13 @@ namespace ProjectManager.Views
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!_viewModel.Validate())
+            if (!_viewModel.TryValidate(out IReadOnlyList<string> validationErrors))
             {
-                MessageBox.Show("Заполните все обязательные поля", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    string.Join(Environment.NewLine, validationErrors),
+                    "Проверка данных",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 

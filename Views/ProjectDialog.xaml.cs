@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Windows;
@@ -38,9 +39,13 @@ namespace ProjectManager.Views
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!_viewModel.Validate())
+            if (!_viewModel.TryValidate(out IReadOnlyList<string> validationErrors))
             {
-                MessageBox.Show("Название обязательно", "Проверка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    string.Join(Environment.NewLine, validationErrors),
+                    "Проверка данных",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
 

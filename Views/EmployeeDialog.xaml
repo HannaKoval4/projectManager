@@ -52,9 +52,16 @@
                         <TextBlock Text="ФИО" Style="{StaticResource LabelText}"/>
                         <TextBox x:Name="NameTextBox"
                                  Margin="{StaticResource FormFieldSpacing}"/>
+                        <TextBlock x:Name="NameErrorText"
+                                   Visibility="Collapsed"
+                                   Style="{StaticResource ErrorText}"/>
 
                         <TextBlock Text="Должность" Style="{StaticResource LabelText}"/>
-                        <TextBox x:Name="PositionTextBox"/>
+                        <TextBox x:Name="PositionTextBox"
+                                 Margin="{StaticResource FormFieldSpacing}"/>
+                        <TextBlock x:Name="PositionErrorText"
+                                   Visibility="Collapsed"
+                                   Style="{StaticResource ErrorText}"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>

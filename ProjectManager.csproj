@@ -129,6 +129,7 @@
     <Compile Include="Converters\StatusToColorConverter.cs" />
     <Compile Include="Data\ProjectManagerDbContext.cs" />
     <Compile Include="Services\AuthService.cs" />
+    <Compile Include="Services\FieldValidation.cs" />
     <Compile Include="Services\DatabaseSchema.cs" />
     <Compile Include="Services\DatabaseService.cs" />
     <Compile Include="Services\SessionService.cs" />

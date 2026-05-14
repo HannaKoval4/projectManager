@@ -18,21 +18,15 @@ namespace ProjectManager.Services
             errorMessage = null;
 
             username = (username ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(username))
+            errorMessage = FieldValidation.ValidateUsername(username);
+            if (errorMessage != null)
             {
-                errorMessage = "Логин не может быть пустым.";
                 return false;
             }
 
-            if (username.Length > 100)
+            errorMessage = FieldValidation.ValidateNewPassword(password);
+            if (errorMessage != null)
             {
-                errorMessage = "Логин слишком длинный (максимум 100 символов).";
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
-            {
-                errorMessage = "Пароль должен быть не короче 6 символов.";
                 return false;
             }
 
@@ -91,15 +85,15 @@ namespace ProjectManager.Services
             errorMessage = null;
 
             username = (username ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(username))
+            errorMessage = FieldValidation.ValidateUsername(username);
+            if (errorMessage != null)
             {
-                errorMessage = "Введите логин.";
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            errorMessage = FieldValidation.ValidateNewPassword(newPassword);
+            if (errorMessage != null)
             {
-                errorMessage = "Пароль должен быть не короче 6 символов.";
                 return false;
             }
 
@@ -161,9 +155,15 @@ namespace ProjectManager.Services
             errorMessage = null;
 
             username = (username ?? string.Empty).Trim();
-            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
+            errorMessage = FieldValidation.ValidateUsername(username);
+            if (errorMessage != null)
             {
-                errorMessage = "Введите логин и пароль.";
+                return false;
+            }
+
+            errorMessage = FieldValidation.ValidatePasswordForLogin(password);
+            if (errorMessage != null)
+            {
                 return false;
             }
 

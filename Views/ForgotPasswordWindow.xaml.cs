@@ -42,22 +42,28 @@ namespace ProjectManager.Views
 
             bool hasError = false;
 
-            if (string.IsNullOrWhiteSpace(username))
+            var loginErr = FieldValidation.ValidateUsername(UsernameTextBox.Text);
+            if (loginErr != null)
             {
-                ShowFieldError(UsernameErrorText, "Введите логин.");
+                ShowFieldError(UsernameErrorText, loginErr);
                 hasError = true;
             }
 
-            if (string.IsNullOrWhiteSpace(password))
+            var passErr = FieldValidation.ValidateNewPassword(password);
+            if (passErr != null)
             {
-                ShowFieldError(PasswordErrorText, "Введите новый пароль.");
+                ShowFieldError(PasswordErrorText, passErr);
                 hasError = true;
             }
 
-            if (password != confirmPassword)
+            if (passErr == null)
             {
-                ShowFieldError(ConfirmPasswordErrorText, "Пароли не совпадают.");
-                hasError = true;
+                var confirmErr = FieldValidation.ValidatePasswordConfirm(password, confirmPassword);
+                if (confirmErr != null)
+                {
+                    ShowFieldError(ConfirmPasswordErrorText, confirmErr);
+                    hasError = true;
+                }
             }
 
             if (hasError)

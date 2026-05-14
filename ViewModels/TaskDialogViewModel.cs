@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using ProjectManager.Data;
 using ProjectManager.Models;
+using ProjectManager.Services;
 
 namespace ProjectManager.ViewModels
 {
@@ -137,25 +139,76 @@ namespace ProjectManager.ViewModels
             }
         }
 
-        public bool Validate()
+        public IReadOnlyList<string> GetValidationErrorMessages()
         {
-            if (string.IsNullOrWhiteSpace(Title)) return false;
-            if (SelectedProject == null) return false;
-            if (string.IsNullOrWhiteSpace(Status)) return false;
-            if (string.IsNullOrWhiteSpace(Priority)) return false;
-            return true;
+            var list = new List<string>();
+            string titleTrim = Title?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(titleTrim))
+            {
+                list.Add("Укажите название задачи.");
+            }
+            else if (titleTrim.Length > FieldValidation.TaskTitleMaxLength)
+            {
+                list.Add($"Название — не более {FieldValidation.TaskTitleMaxLength} символов.");
+            }
+
+            if (SelectedProject == null)
+            {
+                list.Add("Выберите проект.");
+            }
+
+            string st = Status?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(st))
+            {
+                list.Add("Выберите статус задачи.");
+            }
+            else if (st.Length > FieldValidation.TaskStatusMaxLength)
+            {
+                list.Add($"Статус — не более {FieldValidation.TaskStatusMaxLength} символов.");
+            }
+
+            string pr = Priority?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(pr))
+            {
+                list.Add("Выберите приоритет.");
+            }
+            else if (pr.Length > FieldValidation.TaskPriorityMaxLength)
+            {
+                list.Add($"Приоритет — не более {FieldValidation.TaskPriorityMaxLength} символов.");
+            }
+
+            if (DueDate.HasValue && SelectedProject != null)
+            {
+                if (SelectedProject.Deadline.HasValue && DueDate.Value.Date > SelectedProject.Deadline.Value.Date)
+                {
+                    list.Add("Срок задачи не может быть позже дедлайна проекта.");
+                }
+
+                if (SelectedProject.StartDate.HasValue && DueDate.Value.Date < SelectedProject.StartDate.Value.Date)
+                {
+                    list.Add("Срок задачи не может быть раньше даты начала проекта.");
+                }
+            }
+
+            return list;
+        }
+
+        public bool TryValidate(out IReadOnlyList<string> errors)
+        {
+            errors = GetValidationErrorMessages();
+            return errors.Count == 0;
         }
 
         public void Save()
         {
-            if (!Validate())
+            if (!TryValidate(out _))
             {
-                throw new InvalidOperationException("Заполните все обязательные поля");
+                throw new InvalidOperationException("Проверьте заполнение полей задачи.");
             }
 
-            _task.Title = Title;
-            _task.Status = Status;
-            _task.Priority = Priority;
+            _task.Title = Title?.Trim();
+            _task.Status = Status?.Trim();
+            _task.Priority = Priority?.Trim();
             _task.ProjectID = SelectedProject.ID;
             _task.EmployeeID = SelectedEmployee?.ID;
             _task.DueDate = DueDate;
