@@ -41,3 +41,5 @@ c:\Users\user1\Desktop\projectManager\obj\Debug\Views\MainWindow.baml
 c:\Users\user1\Desktop\projectManager\obj\Debug\Views\ProjectDetailsWindow.baml
 c:\Users\user1\Desktop\projectManager\obj\Debug\Styles.baml
 c:\Users\user1\Desktop\projectManager\obj\Debug\ProjectManager.g.resources
+c:\Users\user1\Desktop\projectManager\obj\Debug\Views\ForgotPasswordWindow.baml
+c:\Users\user1\Desktop\projectManager\obj\Debug\Views\ForgotPasswordWindow.g.cs

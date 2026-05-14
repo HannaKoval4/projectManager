@@ -57,11 +57,18 @@ namespace ProjectManager.Views
 
         private void ForgotPassword_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show(
-                "Восстановление пароля пока не настроено. Обратитесь к администратору системы.",
-                "Забыли пароль?",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            string preset = LoginTextBox.Text?.Trim();
+            var dialog = new ForgotPasswordWindow(preset)
+            {
+                Owner = this
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                PasswordBox.Password = string.Empty;
+                PasswordTextBox.Text = string.Empty;
+                ClearErrors();
+                PasswordBox.Focus();
+            }
         }
 
         private void RegisterButton_Click(object sender, RoutedEventArgs e)

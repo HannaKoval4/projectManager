@@ -83,6 +83,78 @@ namespace ProjectManager.Services
             return true;
         }
 
+        /// <summary>
+        /// Устанавливает новый пароль по логину (локальное приложение без почты; доверие к вводу логина).
+        /// </summary>
+        public static bool ResetPassword(string username, string newPassword, out string errorMessage)
+        {
+            errorMessage = null;
+
+            username = (username ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                errorMessage = "Введите логин.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 6)
+            {
+                errorMessage = "Пароль должен быть не короче 6 символов.";
+                return false;
+            }
+
+            byte[] salt = new byte[SaltSizeBytes];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(salt);
+            }
+
+            byte[] hash = DeriveHash(newPassword, salt);
+
+            using (var context = new ProjectManagerDbContext())
+            {
+                User user;
+                try
+                {
+                    user = context.Users.FirstOrDefault(u => u.Username == username);
+                }
+                catch (SqlException)
+                {
+                    errorMessage = "Не удалось подключиться к базе данных. Проверьте, что SQL Server/LocalDB установлен и база создана.";
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = "Ошибка: " + ex.Message;
+                    return false;
+                }
+
+                if (user == null)
+                {
+                    errorMessage = "Пользователь с таким логином не найден.";
+                    return false;
+                }
+
+                int userId = user.ID;
+                if (!DatabaseService.ExecuteInTransaction(context, () =>
+                {
+                    var tracked = context.Users.Find(userId);
+                    if (tracked == null)
+                    {
+                        throw new InvalidOperationException("Пользователь не найден.");
+                    }
+
+                    tracked.PasswordSalt = salt;
+                    tracked.PasswordHash = hash;
+                }, out errorMessage))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public static bool ValidateLogin(string username, string password, out User user, out string errorMessage)
         {
             user = null;
