@@ -76,7 +76,7 @@ namespace ProjectManager.Services
             DatabaseService.ExecuteInTransaction(context, () =>
             {
                 var employees = SeedEmployees(context);
-                var projects = SeedProjects(context);
+                var projects = SeedProjects(context, employees);
                 SeedTasks(context, projects, employees);
             });
         }
@@ -85,14 +85,14 @@ namespace ProjectManager.Services
         {
             var employees = new List<Employee>
             {
-                new Employee { FullName = "Алина Сергеева", Position = "Разработчик" },
-                new Employee { FullName = "Илья Миронов", Position = "Тестировщик" },
-                new Employee { FullName = "Мария Кузнецова", Position = "Менеджер" },
-                new Employee { FullName = "Ольга Федорова", Position = "Аналитик" },
-                new Employee { FullName = "Денис Орлов", Position = "Разработчик" },
-                new Employee { FullName = "Екатерина Волкова", Position = "Дизайнер" },
-                new Employee { FullName = "Артём Климов", Position = "DevOps" },
-                new Employee { FullName = "Наталья Белова", Position = "Руководитель проекта" }
+                new Employee { FullName = "Алина Сергеева", Position = "Разработчик", Skills = "C#, WPF, EF" },
+                new Employee { FullName = "Илья Миронов", Position = "Тестировщик", Skills = "QA, чек-листы, отчёты" },
+                new Employee { FullName = "Мария Кузнецова", Position = "Менеджер", Skills = "Планирование, риски, коммуникации" },
+                new Employee { FullName = "Ольга Федорова", Position = "Аналитик", Skills = "CRM, API, интеграции" },
+                new Employee { FullName = "Денис Орлов", Position = "Разработчик", Skills = "C#, SQL, безопасность" },
+                new Employee { FullName = "Екатерина Волкова", Position = "Дизайнер", Skills = "UI, Figma, прототипы" },
+                new Employee { FullName = "Артём Климов", Position = "DevOps", Skills = "CI/CD, Docker, мониторинг" },
+                new Employee { FullName = "Наталья Белова", Position = "Руководитель проекта", Skills = "PM, бюджет, отчётность" }
             };
 
             context.Employees.AddRange(employees);
@@ -100,45 +100,89 @@ namespace ProjectManager.Services
             return employees;
         }
 
-        private static List<Project> SeedProjects(ProjectManagerDbContext context)
+        private static List<Project> SeedProjects(ProjectManagerDbContext context, List<Employee> employees)
         {
+            int mariaId = employees.First(e => e.FullName.StartsWith("Мария", StringComparison.Ordinal)).ID;
+
             var projects = new List<Project>
             {
                 new Project
                 {
                     Name = "Сайт корпоративного портала",
                     Description = "Авторизация, новости, база знаний, интеграция с задачами и ролями доступа.",
-                    Deadline = Today.AddDays(36)
+                    Deadline = new DateTime(2026, 6, 30),
+                    StartDate = new DateTime(2026, 3, 1),
+                    Client = "ООО «Вектор»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Высокий",
+                    Budget = 1200000,
+                    Tags = "web, auth, docs",
+                    ResponsibleEmployeeID = mariaId
                 },
                 new Project
                 {
                     Name = "Внедрение CRM",
                     Description = "Миграция данных, обучение отдела продаж, интеграция с почтой и телефонией.",
-                    Deadline = Today.AddDays(68)
+                    Deadline = new DateTime(2026, 5, 1),
+                    StartDate = new DateTime(2026, 2, 15),
+                    Client = "ООО «Сфера»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Высокий",
+                    Budget = 2500000,
+                    Tags = "crm, sales, почта",
+                    ResponsibleEmployeeID = employees[7].ID
                 },
                 new Project
                 {
                     Name = "Мобильное приложение",
                     Description = "MVP для iOS/Android, интеграция с корпоративным API и пуш-уведомлениями.",
-                    Deadline = Today.AddDays(22)
+                    Deadline = Today.AddDays(22),
+                    StartDate = Today.AddDays(-30),
+                    Client = "ООО «Мобайл»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Средний",
+                    Budget = 890000,
+                    Tags = "mobile, api",
+                    ResponsibleEmployeeID = employees[0].ID
                 },
                 new Project
                 {
                     Name = "Рефакторинг отчётов",
                     Description = "Перенос отчётности на единый модуль, оптимизация запросов и кеширование.",
-                    Deadline = Today.AddDays(14)
+                    Deadline = Today.AddDays(14),
+                    StartDate = Today.AddDays(-14),
+                    Client = "ООО «Аналитика»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Средний",
+                    Budget = 450000,
+                    Tags = "reports, sql",
+                    ResponsibleEmployeeID = employees[3].ID
                 },
                 new Project
                 {
                     Name = "Автоматизация HR-процессов",
                     Description = "Онбординг, заявки на отпуск, согласование документов, оргструктура.",
-                    Deadline = Today.AddDays(52)
+                    Deadline = Today.AddDays(52),
+                    StartDate = Today.AddDays(-10),
+                    Client = "ООО «HR Плюс»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Низкий",
+                    Budget = 600000,
+                    Tags = "hr, docs",
+                    ResponsibleEmployeeID = employees[2].ID
                 },
                 new Project
                 {
                     Name = "Интеграция с 1С",
                     Description = "Синхронизация справочников, обмен заказами, мониторинг ошибок интеграции.",
-                    Deadline = Today.AddDays(90)
+                    Deadline = Today.AddDays(90),
+                    StartDate = Today.AddDays(-5),
+                    Client = "ООО «Интегра»",
+                    ProjectStatus = "Активен",
+                    ProjectPriority = "Высокий",
+                    Budget = 3100000,
+                    Tags = "1c, sync",
+                    ResponsibleEmployeeID = employees[6].ID
                 }
             };
 
@@ -152,9 +196,21 @@ namespace ProjectManager.Services
             var statuses = new[] { "Новая", "В работе", "На проверке", "Завершена" };
             var priorities = new[] { "Низкий", "Средний", "Высокий", "Критический" };
 
+            Employee ByPrefix(string prefix) =>
+                employees.First(e => e.FullName.StartsWith(prefix, StringComparison.Ordinal));
+
+            var portal = projects[0];
+            var crm = projects[1];
+            var hr = projects[4];
+
             var tasks = new List<Task>
             {
-                NewTask(projects[0], employees[2], "Сверстать главную страницу портала", statuses[1], priorities[2]),
+                NewTask(portal, ByPrefix("Илья"), "Сверстать страницу входа", "В работе", priorities[1], new DateTime(2026, 4, 18)),
+                NewTask(portal, ByPrefix("Алина"), "Подключить EF6 и миграции", "Новая", priorities[1], new DateTime(2026, 4, 25)),
+                NewTask(hr, ByPrefix("Денис"), "Проверить роли доступа", "Новая", priorities[1], new DateTime(2026, 4, 27)),
+                NewTask(crm, ByPrefix("Ольга"), "Интеграция с CRM (API)", "В работе", priorities[2], new DateTime(2026, 4, 19)),
+                NewTask(portal, ByPrefix("Мария"), "Собрать релиз-кандидат", "В работе", priorities[1], new DateTime(2026, 5, 2)),
+
                 NewTask(projects[0], employees[0], "Подключить SSO и роли доступа", statuses[2], priorities[3]),
                 NewTask(projects[0], employees[5], "Собрать UI-кит для компонентов", statuses[3], priorities[1]),
                 NewTask(projects[0], employees[3], "Согласовать требования к базе знаний", statuses[1], priorities[1]),
@@ -238,7 +294,7 @@ namespace ProjectManager.Services
             AuthService.Register(username, password, employeeId, out _);
         }
 
-        private static Task NewTask(Project project, Employee employee, string title, string status, string priority)
+        private static Task NewTask(Project project, Employee employee, string title, string status, string priority, DateTime? dueDate = null)
         {
             return new Task
             {
@@ -246,7 +302,8 @@ namespace ProjectManager.Services
                 EmployeeID = employee?.ID,
                 Title = title,
                 Status = status,
-                Priority = priority
+                Priority = priority,
+                DueDate = dueDate
             };
         }
     }

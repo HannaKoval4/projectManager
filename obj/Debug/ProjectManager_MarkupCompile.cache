@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 c:\Users\user1\Desktop\projectManager\App.xaml
-121544499603
+13252596650
 
-37-1753954775
-161934204153
-Views\MainWindow.xaml;Views\ProjectDialog.xaml;Views\TaskDialog.xaml;Views\LoginWindow.xaml;Views\RegisterWindow.xaml;Views\ProjectDetailsWindow.xaml;Views\ProjectsView.xaml;Views\TasksView.xaml;Views\TeamView.xaml;Views\StatisticsView.xaml;Views\EmployeeDialog.xaml;Styles.xaml;
+40115792608
+161479497138
+Views\MainWindow.xaml;Views\ProjectDialog.xaml;Views\TaskDialog.xaml;Views\LoginWindow.xaml;Views\RegisterWindow.xaml;Views\ProjectDetailsWindow.xaml;Views\ProjectsView.xaml;Views\TasksView.xaml;Views\TeamView.xaml;Views\StatisticsView.xaml;Views\HelpView.xaml;Views\EmployeeDialog.xaml;Styles.xaml;
 
 False
 

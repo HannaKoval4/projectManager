@@ -8,26 +8,60 @@ using ProjectManager.Data;
 using ProjectManager.Models;
 using ProjectManager.Services;
 using ProjectManager.Views;
+using TaskModel = ProjectManager.Models.Task;
 
 namespace ProjectManager.ViewModels
 {
     public class TasksViewModel : INotifyPropertyChanged
     {
-        private ProjectManagerDbContext _context;
-        private Task _selectedTask;
-        private Project _selectedProjectFilter;
-        private string _selectedStatusFilter;
-        private string _selectedPriorityFilter;
-        private Employee _selectedEmployeeFilter;
+        private readonly Project _allProjectsMarker = new Project { ID = -1, Name = "Все" };
+        private readonly Employee _anyEmployeeMarker = new Employee { ID = -1, FullName = "Любой", Position = "-" };
 
-        public ObservableCollection<Task> Tasks { get; set; }
-        public ObservableCollection<Task> FilteredTasks { get; set; }
+        private ProjectManagerDbContext _context;
+        private TaskModel _selectedTask;
+        private Project _selectedProjectFilter;
+        private Employee _selectedEmployeeFilter;
+        private string _selectedPriorityFilter = "Любой";
+        private string _statusChip = "Все";
+        private string _searchQuery = string.Empty;
+
+        public ObservableCollection<TaskModel> Tasks { get; set; }
+        public ObservableCollection<TaskModel> FilteredTasks { get; set; }
         public ObservableCollection<Project> Projects { get; set; }
         public ObservableCollection<Employee> Employees { get; set; }
         public ObservableCollection<string> Statuses { get; set; }
         public ObservableCollection<string> Priorities { get; set; }
 
-        public Task SelectedTask
+        public ObservableCollection<string> StatusChipOptions { get; }
+        public ObservableCollection<string> PriorityFilterOptions { get; }
+
+        public int TotalTasksCount { get; private set; }
+        public int OverdueTasksCount { get; private set; }
+        public int InProgressTasksCount { get; private set; }
+
+        public string StatusChip
+        {
+            get => _statusChip;
+            set
+            {
+                _statusChip = value;
+                OnPropertyChanged(nameof(StatusChip));
+                ApplyFilters();
+            }
+        }
+
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                _searchQuery = value ?? string.Empty;
+                OnPropertyChanged(nameof(SearchQuery));
+                ApplyFilters();
+            }
+        }
+
+        public TaskModel SelectedTask
         {
             get => _selectedTask;
             set
@@ -48,23 +82,12 @@ namespace ProjectManager.ViewModels
             }
         }
 
-        public string SelectedStatusFilter
-        {
-            get => _selectedStatusFilter;
-            set
-            {
-                _selectedStatusFilter = value;
-                OnPropertyChanged(nameof(SelectedStatusFilter));
-                ApplyFilters();
-            }
-        }
-
         public string SelectedPriorityFilter
         {
             get => _selectedPriorityFilter;
             set
             {
-                _selectedPriorityFilter = value;
+                _selectedPriorityFilter = value ?? "Любой";
                 OnPropertyChanged(nameof(SelectedPriorityFilter));
                 ApplyFilters();
             }
@@ -110,8 +133,11 @@ namespace ProjectManager.ViewModels
         public TasksViewModel(ProjectManagerDbContext context)
         {
             _context = context;
-            Tasks = new ObservableCollection<Task>();
-            FilteredTasks = new ObservableCollection<Task>();
+            StatusChipOptions = new ObservableCollection<string> { "Все", "Новые", "В работе", "На проверке", "Готово" };
+            PriorityFilterOptions = new ObservableCollection<string> { "Любой", "Низкий", "Средний", "Высокий", "Критический" };
+
+            Tasks = new ObservableCollection<TaskModel>();
+            FilteredTasks = new ObservableCollection<TaskModel>();
             Projects = new ObservableCollection<Project>();
             Employees = new ObservableCollection<Employee>();
             Statuses = new ObservableCollection<string> { "Новая", "В работе", "На проверке", "Завершена" };
@@ -133,7 +159,6 @@ namespace ProjectManager.ViewModels
                 Projects.Clear();
                 Employees.Clear();
 
-                // Оптимизация: используем AsNoTracking для чтения и загружаем только необходимые данные
                 var tasks = _context.Tasks
                     .Include("Project")
                     .Include("Employee")
@@ -147,15 +172,23 @@ namespace ProjectManager.ViewModels
                     Tasks.Add(task);
                 }
 
+                Projects.Add(_allProjectsMarker);
                 foreach (var project in projects)
                 {
                     Projects.Add(project);
                 }
 
+                Employees.Add(_anyEmployeeMarker);
                 foreach (var employee in employees)
                 {
                     Employees.Add(employee);
                 }
+
+                SelectedProjectFilter = _allProjectsMarker;
+                SelectedEmployeeFilter = _anyEmployeeMarker;
+                SelectedPriorityFilter = "Любой";
+                StatusChip = "Все";
+                SearchQuery = string.Empty;
 
                 ApplyFilters();
             }
@@ -170,41 +203,68 @@ namespace ProjectManager.ViewModels
             FilteredTasks.Clear();
             var filtered = Tasks.AsEnumerable();
 
-            if (SelectedProjectFilter != null)
+            if (SelectedProjectFilter != null && SelectedProjectFilter.ID > 0)
             {
                 filtered = filtered.Where(t => t.ProjectID == SelectedProjectFilter.ID);
             }
 
-            if (!string.IsNullOrEmpty(SelectedStatusFilter))
+            if (!string.IsNullOrEmpty(StatusChip) && StatusChip != "Все")
             {
-                filtered = filtered.Where(t => t.Status == SelectedStatusFilter);
+                var dbStatus = StatusChip == "Новые" ? "Новая"
+                    : StatusChip == "Готово" ? "Завершена"
+                    : StatusChip;
+                filtered = filtered.Where(t => t.Status == dbStatus);
             }
 
-            if (!string.IsNullOrEmpty(SelectedPriorityFilter))
+            if (!string.IsNullOrWhiteSpace(SelectedPriorityFilter) && SelectedPriorityFilter != "Любой")
             {
                 filtered = filtered.Where(t => t.Priority == SelectedPriorityFilter);
             }
 
-            if (SelectedEmployeeFilter != null)
+            if (SelectedEmployeeFilter != null && SelectedEmployeeFilter.ID > 0)
             {
                 filtered = filtered.Where(t => t.EmployeeID == SelectedEmployeeFilter.ID);
+            }
+
+            var q = SearchQuery.Trim();
+            if (!string.IsNullOrEmpty(q))
+            {
+                filtered = filtered.Where(t =>
+                    (t.Title != null && t.Title.IndexOf(q, StringComparison.OrdinalIgnoreCase) >= 0));
             }
 
             foreach (var task in filtered)
             {
                 FilteredTasks.Add(task);
             }
+
+            UpdateSummary();
+        }
+
+        private void UpdateSummary()
+        {
+            TotalTasksCount = Tasks.Count;
+            OverdueTasksCount = Tasks.Count(t =>
+                t.DueDate.HasValue
+                && t.DueDate.Value.Date < DateTime.Today.Date
+                && t.Status != "Завершена");
+            InProgressTasksCount = Tasks.Count(t => t.Status == "В работе");
+
+            OnPropertyChanged(nameof(TotalTasksCount));
+            OnPropertyChanged(nameof(OverdueTasksCount));
+            OnPropertyChanged(nameof(InProgressTasksCount));
         }
 
         private void AddTask()
         {
-            if (Projects.Count == 0)
+            var proj = Projects.FirstOrDefault(p => p.ID > 0);
+            if (proj == null)
             {
                 MessageBox.Show("Сначала создайте проект", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 
-            var dialog = new TaskDialog(Projects.First().ID, _context);
+            var dialog = new TaskDialog(proj.ID, _context);
             if (dialog.ShowDialog() == true)
             {
                 LoadData();
@@ -215,7 +275,6 @@ namespace ProjectManager.ViewModels
         {
             if (SelectedTask == null) return;
 
-            // Перезагружаем задачу из контекста для редактирования
             var taskToEdit = _context.Tasks.Find(SelectedTask.ID);
             if (taskToEdit == null) return;
 
@@ -249,10 +308,11 @@ namespace ProjectManager.ViewModels
 
         private void ResetFilters()
         {
-            SelectedProjectFilter = null;
-            SelectedStatusFilter = null;
-            SelectedPriorityFilter = null;
-            SelectedEmployeeFilter = null;
+            SelectedProjectFilter = _allProjectsMarker;
+            SelectedEmployeeFilter = _anyEmployeeMarker;
+            SelectedPriorityFilter = "Любой";
+            StatusChip = "Все";
+            SearchQuery = string.Empty;
             ApplyFilters();
         }
 
@@ -264,4 +324,3 @@ namespace ProjectManager.ViewModels
         }
     }
 }
-

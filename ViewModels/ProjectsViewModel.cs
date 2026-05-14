@@ -63,6 +63,8 @@ namespace ProjectManager.ViewModels
                 {
                     Projects.Add(project);
                 }
+
+                SelectedProject = Projects.FirstOrDefault();
             }
             catch (Exception ex)
             {

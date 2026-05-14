@@ -45,6 +45,18 @@ namespace ProjectManager.ViewModels
             }
         }
 
+        private DateTime? _dueDate;
+
+        public DateTime? DueDate
+        {
+            get => _dueDate;
+            set
+            {
+                _dueDate = value;
+                OnPropertyChanged(nameof(DueDate));
+            }
+        }
+
         private string _title;
         public string Title
         {
@@ -86,6 +98,8 @@ namespace ProjectManager.ViewModels
                 _title = task.Title;
                 _status = task.Status;
                 _priority = task.Priority;
+                _dueDate = task.DueDate;
+                OnPropertyChanged(nameof(DueDate));
                 OnPropertyChanged(nameof(Title));
                 OnPropertyChanged(nameof(Status));
                 OnPropertyChanged(nameof(Priority));
@@ -144,6 +158,7 @@ namespace ProjectManager.ViewModels
             _task.Priority = Priority;
             _task.ProjectID = SelectedProject.ID;
             _task.EmployeeID = SelectedEmployee?.ID;
+            _task.DueDate = DueDate;
 
             if (_task.ID == 0)
             {

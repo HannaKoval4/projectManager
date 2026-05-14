@@ -1,4 +1,6 @@
 using System;
+using System.Data.Entity;
+using System.Linq;
 using System.Windows;
 using ProjectManager.Data;
 using ProjectManager.Models;
@@ -18,7 +20,7 @@ namespace ProjectManager.Views
         {
             InitializeComponent();
             _context = new ProjectManagerDbContext();
-            _viewModel = new ProjectDialogViewModel();
+            _viewModel = new ProjectDialogViewModel(_context);
             DataContext = _viewModel;
         }
 
@@ -26,24 +28,19 @@ namespace ProjectManager.Views
         {
             InitializeComponent();
             _context = new ProjectManagerDbContext();
-            var projectFromDb = _context.Projects.Find(project.ID);
-            if (projectFromDb != null)
-            {
-                _viewModel = new ProjectDialogViewModel(projectFromDb);
-                DataContext = _viewModel;
-            }
-            else
-            {
-                _viewModel = new ProjectDialogViewModel(project);
-                DataContext = _viewModel;
-            }
+            var projectFromDb = _context.Projects.Include("Tasks").FirstOrDefault(p => p.ID == project.ID)
+                               ?? _context.Projects.Find(project.ID);
+            _viewModel = projectFromDb != null
+                ? new ProjectDialogViewModel(_context, projectFromDb)
+                : new ProjectDialogViewModel(_context);
+            DataContext = _viewModel;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (!_viewModel.Validate())
             {
-                MessageBox.Show("Название проекта не может быть пустым", "Ошибка валидации", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Название обязательно", "Проверка", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -58,7 +55,7 @@ namespace ProjectManager.Views
             }
 
             Project = _viewModel.Project;
-            
+
             if (!DatabaseService.ExecuteInTransaction(_context, () =>
             {
                 if (Project.ID == 0)
@@ -73,6 +70,13 @@ namespace ProjectManager.Views
                         existingProject.Name = Project.Name;
                         existingProject.Description = Project.Description;
                         existingProject.Deadline = Project.Deadline;
+                        existingProject.StartDate = Project.StartDate;
+                        existingProject.Client = Project.Client;
+                        existingProject.ProjectStatus = Project.ProjectStatus;
+                        existingProject.ProjectPriority = Project.ProjectPriority;
+                        existingProject.Budget = Project.Budget;
+                        existingProject.Tags = Project.Tags;
+                        existingProject.ResponsibleEmployeeID = Project.ResponsibleEmployeeID;
                         existingProject.Notes = Project.Notes;
                     }
                 }
@@ -93,4 +97,3 @@ namespace ProjectManager.Views
         }
     }
 }
-

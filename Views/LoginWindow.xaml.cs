@@ -55,7 +55,21 @@ namespace ProjectManager.Views
             Close();
         }
 
-        private void RegisterLink_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ForgotPassword_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MessageBox.Show(
+                "Восстановление пароля пока не настроено. Обратитесь к администратору системы.",
+                "Забыли пароль?",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void RegisterButton_Click(object sender, RoutedEventArgs e)
+        {
+            OpenRegistrationDialog();
+        }
+
+        private void OpenRegistrationDialog()
         {
             ClearErrors();
 

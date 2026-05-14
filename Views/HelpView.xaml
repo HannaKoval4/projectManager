@@ -1,0 +1,166 @@
+<UserControl x:Class="ProjectManager.Views.HelpView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="#C8C8C8">
+    <Border CornerRadius="20"
+            Margin="24"
+            Background="#C8C8C8"
+            Padding="28,22">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="0,0,0,18">
+                <TextBlock Text="О программе"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource TextDarkBrush}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="✕ Закрыть"
+                           HorizontalAlignment="Right"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           FontSize="13"
+                           Cursor="Hand"
+                           MouseLeftButtonUp="CloseHint_MouseLeftButtonUp"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="220"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        Background="White"
+                        CornerRadius="16"
+                        Padding="16,18"
+                        Margin="0,0,16,0">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.12"/>
+                    </Border.Effect>
+                    <StackPanel>
+                        <TextBlock Text="Разделы"
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   Margin="0,0,0,12"/>
+                        <Border Background="#E1F5FE"
+                                BorderBrush="#3498DB"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="12,10">
+                            <Grid>
+                                <TextBlock Text="О программе"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource TextDarkBrush}"/>
+                                <TextBlock Text="v1.0"
+                                           HorizontalAlignment="Right"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextMutedBrush}"/>
+                            </Grid>
+                        </Border>
+                        <TextBlock Text="Этот экран имитирует модальное окно «Справка/О программе»."
+                                   FontSize="11"
+                                   Foreground="{StaticResource TextMutedBrush}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,24,0,0"
+                                   LineHeight="18"/>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Column="1">
+                    <Border Background="White"
+                            CornerRadius="16"
+                            Padding="20,18"
+                            Margin="0,0,0,14">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.12"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0"
+                                    Width="48"
+                                    Height="48"
+                                    CornerRadius="12"
+                                    Background="{StaticResource AccentBlueBrush}"
+                                    VerticalAlignment="Top"
+                                    Margin="0,0,16,0"/>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="ProjectManager"
+                                           FontSize="22"
+                                           FontWeight="Bold"
+                                           Foreground="{StaticResource TextDarkBrush}"/>
+                                <TextBlock Text="Версия 1.0 · Desktop WPF"
+                                           FontSize="13"
+                                           Foreground="{StaticResource TextMutedBrush}"
+                                           Margin="0,6,0,0"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                <Button Content="Открыть документацию"
+                                        Style="{StaticResource ToolbarOutlineButton}"
+                                        Margin="0,0,10,0"
+                                        Click="DocButton_Click"/>
+                                <Button Content="Сообщить об ошибке"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Click="ReportButton_Click"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Border Background="White"
+                            CornerRadius="16"
+                            Padding="20,18">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.12"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <TextBlock Text="Описание"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextDarkBrush}"/>
+                            <TextBlock Text="Краткая справка по приложению и технологиям"
+                                       FontSize="12"
+                                       Foreground="{StaticResource TextMutedBrush}"
+                                       Margin="0,6,0,20"/>
+                            <TextBlock Text="Технологии"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextDarkBrush}"
+                                       Margin="0,0,0,8"/>
+                            <TextBlock Text="Горячие клавиши"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource TextDarkBrush}"
+                                       Margin="0,16,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="2" Margin="0,18,0,0">
+                <TextBlock Text="© 2026 Company · Все права защищены"
+                           FontSize="11"
+                           Foreground="{StaticResource TextMutedBrush}"
+                           VerticalAlignment="Center"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="Сборка: Release"
+                               FontSize="11"
+                               Foreground="{StaticResource TextMutedBrush}"
+                               VerticalAlignment="Center"
+                               Margin="0,0,16,0"/>
+                    <Button Content="Закрыть"
+                            Style="{StaticResource SecondaryButton}"
+                            Padding="22,10"
+                            MinWidth="120"
+                            Click="CloseFooter_Click"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

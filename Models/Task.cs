@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -32,6 +33,19 @@ namespace ProjectManager.Models
 
         [ForeignKey("EmployeeID")]
         public virtual Employee Employee { get; set; }
+
+        public DateTime? DueDate { get; set; }
+
+        [NotMapped]
+        public string StatusDisplay
+        {
+            get
+            {
+                if (DueDate.HasValue && DueDate.Value.Date < DateTime.Today.Date && Status != "Завершена")
+                    return "Просрочено";
+                return Status ?? string.Empty;
+            }
+        }
 
         public virtual ICollection<TaskComment> Comments { get; set; }
 

@@ -20,12 +20,12 @@ namespace ProjectManager.ViewModels
     public class StatisticsViewModel : INotifyPropertyChanged
     {
         private ProjectManagerDbContext _context;
-        private string _selectedPeriod = "Month";
 
-        public int TotalProjects { get; set; }
-        public int CompletedTasks { get; set; }
-        public int ActiveTasks { get; set; }
-        public int TotalEmployees { get; set; }
+        public int ActiveProjectsCount { get; private set; }
+        public int OverdueTasksStat { get; private set; }
+        public int AverageProgressRounded { get; private set; }
+        public int TeamWorkloadRounded { get; private set; }
+        public int TasksTotalStat { get; private set; }
 
         public ObservableCollection<EmployeeStatistic> EmployeeStatistics { get; set; }
 
@@ -43,7 +43,6 @@ namespace ProjectManager.ViewModels
 
         private void FilterByPeriod(string period)
         {
-            _selectedPeriod = period;
             LoadStatistics();
         }
 
@@ -51,22 +50,31 @@ namespace ProjectManager.ViewModels
         {
             try
             {
-                TotalProjects = _context.Projects.Count();
-                CompletedTasks = _context.Tasks.Count(t => t.Status == "Завершена");
-                ActiveTasks = _context.Tasks.Count(t => t.Status != "Завершена");
-                TotalEmployees = _context.Employees.Count();
+                var projects = _context.Projects.Include("Tasks").AsNoTracking().ToList();
+                ActiveProjectsCount = projects.Count(p => p.Tasks != null && p.Tasks.Any() && !p.IsCompleted);
+                OverdueTasksStat = _context.Tasks.AsNoTracking().Count(t =>
+                    t.DueDate.HasValue
+                    && t.DueDate.Value.Date < DateTime.Today.Date
+                    && t.Status != "Завершена");
 
-                OnPropertyChanged(nameof(TotalProjects));
-                OnPropertyChanged(nameof(CompletedTasks));
-                OnPropertyChanged(nameof(ActiveTasks));
-                OnPropertyChanged(nameof(TotalEmployees));
+                var withTasks = projects.Where(p => p.Tasks != null && p.Tasks.Any()).ToList();
+                AverageProgressRounded = (int)Math.Round(withTasks.Count == 0 ? 0 : withTasks.Average(p => p.CompletionPercentage));
+
+                var employees = _context.Employees.Include("Tasks").AsNoTracking().ToList();
+                TeamWorkloadRounded = employees.Count == 0
+                    ? 0
+                    : (int)Math.Round(employees.Average(e =>
+                        Math.Min(100, e.Tasks.Count(t => t.Status != "Завершена") * 14.0)));
+
+                TasksTotalStat = _context.Tasks.AsNoTracking().Count();
+
+                OnPropertyChanged(nameof(ActiveProjectsCount));
+                OnPropertyChanged(nameof(OverdueTasksStat));
+                OnPropertyChanged(nameof(AverageProgressRounded));
+                OnPropertyChanged(nameof(TeamWorkloadRounded));
+                OnPropertyChanged(nameof(TasksTotalStat));
 
                 EmployeeStatistics.Clear();
-                var employees = _context.Employees
-                    .Include("Tasks")
-                    .AsNoTracking()
-                    .ToList();
-
                 foreach (var employee in employees)
                 {
                     var completed = employee.Tasks.Count(t => t.Status == "Завершена");

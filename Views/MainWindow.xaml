@@ -5,43 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:conv="clr-namespace:ProjectManager.Converters"
         mc:Ignorable="d"
-        Title="Менеджер проектов" 
-        Height="800" 
-        Width="1400"
+        Title="Менеджер проектов"
+        Height="820"
+        Width="1480"
+        MinHeight="640"
+        MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource LightGrayBrush}">
     <Window.Resources>
         <conv:StringEqualsConverter x:Key="StringEqualsConverter"/>
+        <Style x:Key="SidebarSearchBox" TargetType="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource MainFont}"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#ECF0F1"/>
+            <Setter Property="CaretBrush" Value="White"/>
+            <Setter Property="Background" Value="#34495E"/>
+            <Setter Property="BorderBrush" Value="#4A6278"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Arrow"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="12"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="268"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        
-        <!-- Боковое меню навигации -->
-        <Border Grid.Column="0" 
-                Background="{StaticResource DarkBlueBrush}">
+
+        <!-- Левая колонка: навигация -->
+        <Border Grid.Column="0"
+                Background="{StaticResource DarkBlueBrush}"
+                Padding="14,20,14,16">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
-                <!-- Заголовок меню -->
-                <Border Grid.Row="0" 
-                        Background="{StaticResource GraphiteBrush}" 
-                        Padding="20,15">
-                    <TextBlock Text="Менеджер проектов" 
+
+                <StackPanel Grid.Row="0" Margin="4,0,4,8">
+                    <TextBlock Text="Менеджер проектов"
                                Foreground="White"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               FontFamily="{StaticResource MainFont}"/>
-                </Border>
-                
-                <!-- Навигационные кнопки -->
-                <StackPanel Grid.Row="1" Margin="0,12,0,0">
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               FontFamily="{StaticResource MainFont}"
+                               Margin="0,0,0,14"/>
+                    <TextBox Style="{StaticResource SidebarSearchBox}"
+                             Text="Навигация"
+                             Padding="14,10"
+                             Margin="0,0,0,4"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Margin="0,8,0,0">
                     <RadioButton Content="Проекты"
                                  Style="{StaticResource NavPill}"
                                  GroupName="Nav"
@@ -66,50 +96,46 @@
                     <RadioButton Content="Статистика"
                                  Style="{StaticResource NavPill}"
                                  GroupName="Nav"
-                                 Tag=""
+                                 Tag="{Binding StatisticsBadge}"
                                  IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Statistics}"
                                  Command="{Binding NavigateCommand}"
                                  CommandParameter="Statistics"/>
+                    <RadioButton Content="Справка"
+                                 Style="{StaticResource NavPill}"
+                                 GroupName="Nav"
+                                 Tag="{Binding HelpBadge}"
+                                 IsChecked="{Binding CurrentView, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Help}"
+                                 Command="{Binding NavigateCommand}"
+                                 CommandParameter="Help"/>
                 </StackPanel>
-                
-                <!-- Информация о пользователе -->
-                <Border Grid.Row="2" 
-                        Background="{StaticResource GraphiteBrush}" 
-                        Padding="15">
+
+                <Border Grid.Row="2"
+                        Background="#34495E"
+                        CornerRadius="14"
+                        Padding="14,12"
+                        Margin="4,16,4,0">
                     <StackPanel>
-                        <TextBlock Text="Пользователь" 
+                        <TextBlock Text="Пользователь"
                                    Foreground="#BDC3C7"
-                                   FontSize="12"
-                                   Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding CurrentUser}" 
+                                   FontSize="11"
+                                   Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding CurrentUser}"
                                    Foreground="White"
                                    FontSize="14"
-                                   FontWeight="SemiBold"/>
+                                   FontWeight="SemiBold"
+                                   TextTrimming="CharacterEllipsis"/>
                         <Button Content="Выйти"
                                 Style="{StaticResource NavButton}"
                                 Margin="0,10,0,0"
+                                HorizontalAlignment="Stretch"
                                 Command="{Binding LogoutCommand}"/>
                     </StackPanel>
                 </Border>
             </Grid>
         </Border>
-        
-        <!-- Основная рабочая область -->
-        <Grid Grid.Column="1" Margin="24">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            <!-- Заголовок раздела -->
-            <TextBlock Grid.Row="0" 
-                       Text="{Binding CurrentViewTitle}"
-                       Style="{StaticResource HeadingText}"
-                       Margin="0,0,0,20"/>
-            
-            <!-- Контент раздела -->
-            <ContentControl Grid.Row="1" 
-                          Content="{Binding CurrentViewContent}"/>
-        </Grid>
+
+        <ContentControl Grid.Column="1"
+                        Margin="0"
+                        Content="{Binding CurrentViewContent}"/>
     </Grid>
 </Window>

@@ -89,6 +89,10 @@ namespace ProjectManager.ViewModels
             }
         }
 
+        public string StatisticsBadge => "Q2";
+
+        public string HelpBadge => "?";
+
         public RelayCommand<string> NavigateCommand { get; set; }
         public RelayCommand LogoutCommand { get; set; }
 
@@ -127,6 +131,10 @@ namespace ProjectManager.ViewModels
                 case "Statistics":
                     CurrentViewTitle = "Статистика";
                     CurrentViewContent = new StatisticsView(_context);
+                    break;
+                case "Help":
+                    CurrentViewTitle = "Справка";
+                    CurrentViewContent = new HelpView();
                     break;
                 default:
                     CurrentViewTitle = "Проекты";

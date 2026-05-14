@@ -28,6 +28,12 @@ namespace ProjectManager.Data
                 .HasForeignKey(t => t.ProjectID)
                 .WillCascadeOnDelete(true);
 
+            modelBuilder.Entity<Project>()
+                .HasOptional(p => p.ResponsibleEmployee)
+                .WithMany()
+                .HasForeignKey(p => p.ResponsibleEmployeeID)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<Employee>()
                 .HasMany(e => e.Tasks)
                 .WithOptional(t => t.Employee)

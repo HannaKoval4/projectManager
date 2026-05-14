@@ -71,6 +71,9 @@
                         <ComboBox ItemsSource="{Binding Employees}"
                                   SelectedItem="{Binding SelectedEmployee}"
                                   DisplayMemberPath="FullName"/>
+
+                        <TextBlock Text="Срок (дедлайн)" Style="{StaticResource LabelText}"/>
+                        <DatePicker SelectedDate="{Binding DueDate}" Margin="{StaticResource FormFieldSpacing}"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
